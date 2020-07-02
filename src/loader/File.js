@@ -274,21 +274,14 @@ var File = new Class({
         {
             this.src = GetURL(this, this.loader.baseURL);
 
-            if (this.src.indexOf('data:') === 0)
-            {
-                console.warn('Local data URIs are not supported: ' + this.key);
-            }
-            else
-            {
-                //  The creation of this XHRLoader starts the load process going.
-                //  It will automatically call the following, based on the load outcome:
-                //  
-                // xhr.onload = this.onLoad
-                // xhr.onerror = this.onError
-                // xhr.onprogress = this.onProgress
+            //  The creation of this XHRLoader starts the load process going.
+            //  It will automatically call the following, based on the load outcome:
+            //  
+            // xhr.onload = this.onLoad
+            // xhr.onerror = this.onError
+            // xhr.onprogress = this.onProgress
 
-                this.xhrLoader = XHRLoader(this, this.loader.xhr);
-            }
+            this.xhrLoader = XHRLoader(this, this.loader.xhr);
         }
     },
 
