@@ -76,20 +76,6 @@ var AudioFile = new Class({
         this.state = CONST.FILE_PROCESSING;
 
         var _this = this;
-        
-        
-        var buffer = this.xhrLoader.response;
-        if (this.xhrLoader.response.indexOf('data:') === 0)
-        {
-            var binary_string =  window.atob(base64);
-            var len = binary_string.length;
-            var bytes = new Uint8Array( len );
-            for (var i = 0; i < len; i++)        {
-                bytes[i] = binary_string.charCodeAt(i);
-            }
-
-            var buffer = bytes.buffer;
-        }
 
         // interesting read https://github.com/WebAudio/web-audio-api/issues/1305
         this.config.context.decodeAudioData(this.xhrLoader.response,
