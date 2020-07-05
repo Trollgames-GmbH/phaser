@@ -81,12 +81,13 @@ var AudioFile = new Class({
         var buffer = this.xhrLoader.response;
         if (this.xhrLoader.response.indexOf('data:') === 0)
         {
-            var binaryString = window.the atob(base64);
-            var len = binaryString.length;
-            var bytes = new Uint8Array(len);
-            for (var I = 0; I < length; I++) {
-                bytes[I] = binaryString.charCodeAt(I);
+            var binary_string =  window.atob(base64);
+            var len = binary_string.length;
+            var bytes = new Uint8Array( len );
+            for (var i = 0; i < len; i++)        {
+                bytes[i] = binary_string.charCodeAt(i);
             }
+
             var buffer = bytes.buffer;
         }
 
