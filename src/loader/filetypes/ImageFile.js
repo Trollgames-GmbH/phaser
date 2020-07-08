@@ -73,9 +73,8 @@ var ImageFile = new Class({
 
         File.call(this, loader, fileConfig);
         
-        if(typeof url === "string" && url.indexOf('data:') !== 0) {
+        if(typeof url === "string" && url.indexOf('data:') === 0) {
             this.data = url;
-            
             this.state = CONST.FILE_POPULATED
         }
         //  Do we have a normal map to load as well?
@@ -100,29 +99,47 @@ var ImageFile = new Class({
      */
     onProcess: function ()
     {
-        this.state = CONST.FILE_PROCESSING;
+        if (this.state !== CONST.FILE_POPULATED) {
+            this.state = CONST.FILE_PROCESSING;
 
-        this.data = new Image();
+            this.data = new Image();
 
-        this.data.crossOrigin = this.crossOrigin;
+            this.data.crossOrigin = this.crossOrigin;
 
-        var _this = this;
+            var _this = this;
 
-        this.data.onload = function ()
-        {
-            File.revokeObjectURL(_this.data);
+            this.data.onload = function ()
+            {
+                File.revokeObjectURL(_this.data);
 
-            _this.onProcessComplete();
-        };
+                _this.onProcessComplete();
+            };
 
-        this.data.onerror = function ()
-        {
-            File.revokeObjectURL(_this.data);
+            this.data.onerror = function ()
+            {
+                File.revokeObjectURL(_this.data);
 
-            _this.onProcessError();
-        };
+                _this.onProcessError();
+            };
 
-        File.createObjectURL(this.data, this.xhrLoader.response, 'image/png');
+            File.createObjectURL(this.data, this.xhrLoader.response, 'image/png');
+        } else {
+            var base64 = this.data;
+
+            this.data = new Image();
+            this.data.src = base64;
+
+            this.data.crossOrigin = this.crossOrigin;
+
+            var _this = this;
+            this.data.onload = function () {
+                _this.onProcessComplete();
+            };
+
+            this.data.onerror = function () {
+                _this.onProcessError();
+            };
+        }
     },
 
     /**
