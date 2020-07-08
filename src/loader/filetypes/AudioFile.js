@@ -62,6 +62,11 @@ var AudioFile = new Class({
         };
 
         File.call(this, loader, fileConfig);
+        
+        if(typeof urlConfig.url === "string" && urlConfig.url.indexOf('data:') === 0) {
+            this.data = urlConfig.url;
+            this.state = CONST.FILE_POPULATED
+        }
     },
 
     /**
@@ -73,26 +78,54 @@ var AudioFile = new Class({
      */
     onProcess: function ()
     {
-        this.state = CONST.FILE_PROCESSING;
+        if (this.state !== CONST.FILE_POPULATED) {
+            this.state = CONST.FILE_PROCESSING;
 
-        var _this = this;
+            var _this = this;
 
-        // interesting read https://github.com/WebAudio/web-audio-api/issues/1305
-        this.config.context.decodeAudioData(this.xhrLoader.response,
-            function (audioBuffer)
-            {
-                _this.data = audioBuffer;
+            // interesting read https://github.com/WebAudio/web-audio-api/issues/1305
+            this.config.context.decodeAudioData(this.xhrLoader.response,
+                function (audioBuffer)
+                {
+                    _this.data = audioBuffer;
 
-                _this.onProcessComplete();
-            },
-            function (e)
-            {
-                // eslint-disable-next-line no-console
-                console.error('Error decoding audio: ' + this.key + ' - ', e ? e.message : null);
+                    _this.onProcessComplete();
+                },
+                function (e)
+                {
+                    // eslint-disable-next-line no-console
+                    console.error('Error decoding audio: ' + this.key + ' - ', e ? e.message : null);
 
-                _this.onProcessError();
+                    _this.onProcessError();
+                }
+            );
+        } else {
+            var base64 = this.data;
+
+            var _this = this;
+
+            var binary_string = window.atob(base64.split(',')[1]);
+            var len = binary_string.length;
+            var bytes = new Uint8Array(len);
+            for (var i = 0; i < len; i++) {
+                bytes[i] = binary_string.charCodeAt(i);
             }
-        );
+            var buffer = bytes.buffer;
+            // interesting read https://github.com/WebAudio/web-audio-api/issues/1305
+            this.config.context.decodeAudioData(buffer,
+                function (audioBuffer) {
+                    _this.data = audioBuffer;
+
+                    _this.onProcessComplete();
+                },
+                function (e) {
+                    // eslint-disable-next-line no-console
+                    console.error('Error decoding audio: ' + this.key + ' - ', e ? e.message : null);
+
+                    _this.onProcessError();
+                }
+            );
+        }
 
         this.config.context = null;
     }
