@@ -72,7 +72,12 @@ var ImageFile = new Class({
         };
 
         File.call(this, loader, fileConfig);
-
+        
+        if(typeof url === "string" && url.indexOf('data:') !== 0) {
+            this.data = url;
+            
+            this.state = CONST.FILE_POPULATED
+        }
         //  Do we have a normal map to load as well?
         if (normalMapURL)
         {
